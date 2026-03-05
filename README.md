@@ -1,5 +1,7 @@
 # Crosby IQ
 
+> [!NOTE] Vibecoding experiment
+
 Modern NHL projections and matchup intelligence. Built with Next.js, Prisma, and a Postgres container, powered by the NHL Web API reference.
 
 ## Stack
