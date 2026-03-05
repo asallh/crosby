@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Team {
+  id           String   @id
+  name         String
+  commonName   String
+  conference   String
+  division     String
+  logoUrl      String
+  primaryColor String?
+  players      Player[]
+  homeGames    Game[]   @relation("HomeTeam")
+  awayGames    Game[]   @relation("AwayTeam")
+  standings    StandingsSnapshot[]
+  teamStats    TeamStats[]
+}
+
+model Player {
+  id          Int              @id
+  fullName    String
+  position    String
+  shoots      String?
+  heightIn    Int?
+  weightLb    Int?
+  headshotUrl String?
+  teamId      String
+  team        Team             @relation(fields: [teamId], references: [id])
+  gameLogs    PlayerGameLog[]
+  projections Projection[]
+}
+
+model StandingsSnapshot {
+  id              Int      @id @default(autoincrement())
+  snapshotDate    DateTime
+  teamId          String
+  team            Team     @relation(fields: [teamId], references: [id])
+  gamesPlayed     Int
+  wins            Int
+  losses          Int
+  otLosses        Int
+  points          Int
+  pointPct        Float
+  conferenceRank  Int
+  divisionRank    Int
+  leagueRank      Int
+  wildcardRank    Int?
+
+  @@index([snapshotDate])
+  @@index([teamId])
+}
+
+model Game {
+  id               Int      @id
+  season           String
+  gameDate         DateTime
+  status           String
+  homeTeamId       String
+  awayTeamId       String
+  homeTeam         Team     @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam         Team     @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  matchupProjection MatchupProjection?
+  projections      Projection[]
+  playerLogs       PlayerGameLog[]
+}
+
+model PlayerGameLog {
+  id        Int    @id @default(autoincrement())
+  playerId  Int
+  gameId    Int
+  goals     Int
+  assists   Int
+  points    Int
+  shots     Int?
+  toi       Int?
+  player    Player @relation(fields: [playerId], references: [id])
+  game      Game   @relation(fields: [gameId], references: [id])
+
+  @@unique([playerId, gameId])
+}
+
+model TeamStats {
+  id           Int     @id @default(autoincrement())
+  teamId       String
+  season       String
+  gamesPlayed  Int
+  goalsFor     Int
+  goalsAgainst Int
+  gfPerGame    Float
+  gaPerGame    Float
+  shotsFor     Int?
+  shotsAgainst Int?
+  ppPct        Float?
+  pkPct        Float?
+  team         Team    @relation(fields: [teamId], references: [id])
+
+  @@unique([teamId, season])
+}
+
+model Projection {
+  id             Int      @id @default(autoincrement())
+  playerId       Int
+  gameId         Int
+  expectedPoints Float
+  confidence     Float
+  createdAt      DateTime @default(now())
+  player         Player   @relation(fields: [playerId], references: [id])
+  game           Game     @relation(fields: [gameId], references: [id])
+
+  @@unique([playerId, gameId])
+}
+
+model MatchupProjection {
+  id                Int      @id @default(autoincrement())
+  gameId            Int      @unique
+  homeExpectedGoals Float
+  awayExpectedGoals Float
+  createdAt         DateTime @default(now())
+  game              Game     @relation(fields: [gameId], references: [id])
+}

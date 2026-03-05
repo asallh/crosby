@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: nhl_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nhl
+      POSTGRES_PASSWORD: nhl_password
+      POSTGRES_DB: nhl_stats
+    ports:
+      - "5432:5432"
+    volumes:
+      - nhl_data:/var/lib/postgresql/data
+
+volumes:
+  nhl_data:

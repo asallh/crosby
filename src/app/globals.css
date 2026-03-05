@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+:root {
+  --ink-900: #0a0f1a;
+  --ink-800: #121a29;
+  --ice-50: #f6fbff;
+  --ice-100: #e7f3ff;
+  --ice-200: #c6e2ff;
+  --electric-400: #3bd4ff;
+  --electric-500: #00b7ff;
+  --heat-500: #ff6b4a;
+  --heat-600: #ff4f2e;
+  --gold-500: #ffc457;
+  --card: rgba(10, 15, 26, 0.7);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --shadow: rgba(7, 12, 20, 0.45);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+@theme inline {
+  --color-background: var(--ink-900);
+  --color-foreground: var(--ice-50);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-body);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 800px at 10% -10%, rgba(0, 183, 255, 0.25), transparent 60%),
+    radial-gradient(900px 600px at 90% 10%, rgba(255, 107, 74, 0.18), transparent 65%),
+    linear-gradient(180deg, #0b1220 0%, #0a0f1a 35%, #070b14 100%);
+  color: var(--ice-50);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.glass {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 20px 60px var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.stat-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.card-grid {
+  position: relative;
+  isolation: isolate;
+}
+
+.card-grid::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, rgba(0, 183, 255, 0.35), rgba(255, 79, 46, 0.25));
+  opacity: 0.4;
+  filter: blur(60px);
+  z-index: -1;
+}
+
+.floaty {
+  animation: float 6s ease-in-out infinite;
+}
+
+.fade-up {
+  animation: fadeUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+.glow {
+  box-shadow: 0 0 25px rgba(0, 183, 255, 0.3);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
