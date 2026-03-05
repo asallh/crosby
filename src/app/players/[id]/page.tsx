@@ -159,7 +159,17 @@ export default async function PlayerDetailPage({ params }: PageProps) {
   const projectedEnd = pts + basePoints * remainingGames;
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-6 pb-24 pt-10 md:px-14">
+    <main className="relative mx-auto w-full max-w-6xl px-6 pb-24 pt-10 md:px-14">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -right-56 -top-10 h-[720px] w-[720px] opacity-[0.19] [mask-image:radial-gradient(circle,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.3)_55%,transparent_78%)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={player.team.logoUrl}
+            alt={`${player.team.commonName} logo`}
+            className="h-full w-full object-contain blur-[6px] saturate-0"
+          />
+        </div>
+      </div>
       <div className="mb-6">
         <Link
           href="/players"
