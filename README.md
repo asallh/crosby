@@ -3,6 +3,11 @@
 > [!TIP] Vibecoding experiment
 > This repo is part of a vibecoding experiment.
 
+### Built with:
+
+- OpenCode
+- OpenRouter (Codex 5.2 and Opus 4.6)
+
 Modern NHL projections and matchup intelligence. Built with Next.js, Prisma, and a Postgres container, powered by the NHL Web API reference.
 
 ## Stack

@@ -5,6 +5,8 @@ const navItems = [
   { href: "/players", label: "Players" },
   { href: "/teams", label: "Teams" },
   { href: "/matchups", label: "Head-to-Head" },
+  { href: "/rookies", label: "Rookies" },
+  { href: "/awards", label: "Awards" },
 ];
 
 export default function SiteNav() {

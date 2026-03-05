@@ -101,6 +101,33 @@ const gameLogSchema = z
   })
   .passthrough();
 
+const playerLandingSchema = z
+  .object({
+    playerId: z.number(),
+    careerTotals: z
+      .object({
+        regularSeason: z
+          .object({
+            gamesPlayed: z.number().optional(),
+          })
+          .optional(),
+      })
+      .optional(),
+    seasonTotals: z
+      .array(
+        z
+          .object({
+            season: z.number(),
+            leagueAbbrev: z.string().optional(),
+            gameTypeId: z.number().optional(),
+            gamesPlayed: z.number().optional(),
+          })
+          .passthrough()
+      )
+      .optional(),
+  })
+  .passthrough();
+
 
 const seasonsSchema = z.array(z.number());
 
@@ -140,6 +167,10 @@ export async function fetchRoster(teamAbbrev: string) {
 
 export async function fetchPlayerGameLog(playerId: number, season: string) {
   return nhlFetch(`/v1/player/${playerId}/game-log/${season}/2`, gameLogSchema);
+}
+
+export async function fetchPlayerLanding(playerId: number) {
+  return nhlFetch(`/v1/player/${playerId}/landing`, playerLandingSchema);
 }
 
 
