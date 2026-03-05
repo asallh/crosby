@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, Sora } from "next/font/google";
 import "./globals.css";
+import SiteNav from "@/components/site-nav";
 
 const displayFont = Barlow_Condensed({
   variable: "--font-display",
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${displayFont.variable} ${bodyFont.variable} antialiased`}
       >
+        <SiteNav />
         {children}
       </body>
     </html>

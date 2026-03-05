@@ -39,26 +39,11 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen">
-      <header className="relative overflow-hidden px-6 pb-16 pt-12 md:px-14">
+      <header className="relative overflow-hidden px-6 pb-16 pt-6 md:px-14">
         <div className="absolute -right-32 top-10 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
         <div className="absolute -left-24 top-24 h-80 w-80 rounded-full bg-orange-500/10 blur-3xl" />
 
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-10">
-          <nav className="flex items-center justify-between text-sm text-slate-200">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-2xl bg-cyan-400/20 p-2">
-                <div className="h-full w-full rounded-xl bg-cyan-400/40" />
-              </div>
-              <span className="text-lg font-semibold tracking-wide">
-                Crosby IQ
-              </span>
-            </div>
-            <div className="hidden items-center gap-6 md:flex">
-              <span className="stat-chip px-4 py-2 text-xs">2025-26 Season</span>
-              <span className="stat-chip px-4 py-2 text-xs">Live NHL API</span>
-            </div>
-          </nav>
-
           <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="flex flex-col gap-6">
               <p className="text-xs uppercase tracking-[0.4em] text-slate-300">
@@ -83,6 +68,27 @@ export default async function Home() {
                 <div className="stat-chip px-4 py-2 text-xs text-slate-200">
                   Home ice multiplier
                 </div>
+              </div>
+
+              <div className="flex flex-wrap gap-4">
+                <a
+                  href="/players"
+                  className="rounded-full bg-cyan-400/20 px-5 py-2 text-xs uppercase tracking-[0.25em] text-cyan-100 transition hover:bg-cyan-400/40"
+                >
+                  Explore Players
+                </a>
+                <a
+                  href="/teams"
+                  className="rounded-full bg-white/10 px-5 py-2 text-xs uppercase tracking-[0.25em] text-slate-200 transition hover:bg-white/20"
+                >
+                  View Teams
+                </a>
+                <a
+                  href="/matchups"
+                  className="rounded-full bg-white/10 px-5 py-2 text-xs uppercase tracking-[0.25em] text-slate-200 transition hover:bg-white/20"
+                >
+                  Head-to-Head
+                </a>
               </div>
             </div>
 
