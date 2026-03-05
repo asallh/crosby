@@ -1,6 +1,7 @@
 # Crosby IQ
 
-> [!NOTE] Vibecoding experiment
+> [!TIP] Vibecoding experiment
+> This repo is part of a vibecoding experiment.
 
 Modern NHL projections and matchup intelligence. Built with Next.js, Prisma, and a Postgres container, powered by the NHL Web API reference.
 
@@ -12,38 +13,38 @@ Modern NHL projections and matchup intelligence. Built with Next.js, Prisma, and
 
 ## Quick Start
 
-1) Start Postgres
+1. Start Postgres
 
 ```bash
 docker compose up -d
 ```
 
-2) Install deps
+2. Install deps
 
 ```bash
 pnpm install
 ```
 
-3) Generate Prisma client + migrate
+3. Generate Prisma client + migrate
 
 ```bash
 pnpm db:generate
 pnpm db:migrate
 ```
 
-4) Validate NHL API endpoints
+4. Validate NHL API endpoints
 
 ```bash
 pnpm validate-api
 ```
 
-5) Seed data
+5. Seed data
 
 ```bash
 pnpm db:seed
 ```
 
-6) Run the app
+6. Run the app
 
 ```bash
 pnpm dev
