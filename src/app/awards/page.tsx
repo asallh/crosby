@@ -1,5 +1,6 @@
-import Image from "next/image";
 import { prisma } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 type ProjectionRow = {
   playerId: number;
@@ -90,71 +91,53 @@ export default async function AwardsPage() {
     })
     .filter((row): row is ProjectionRow => row !== null);
 
-  const topRocket = [...projections]
-    .sort((a, b) => b.projGoals - a.projGoals)
-    .slice(0, 5);
-  const topArtRoss = [...projections]
-    .sort((a, b) => b.projPoints - a.projPoints)
-    .slice(0, 5);
-  const topPlaymaker = [...projections]
-    .sort((a, b) => b.projAssists - a.projAssists)
-    .slice(0, 5);
-  const topNorris = projections
-    .filter((row) => row.position === "D")
-    .sort((a, b) => b.projPoints - a.projPoints)
-    .slice(0, 5);
-  const topCalder = projections
-    .filter((row) => row.rookieEligible)
-    .sort((a, b) => b.projPoints - a.projPoints)
-    .slice(0, 5);
-
-  const renderRows = (rows: ProjectionRow[], metric: "projGoals" | "projPoints" | "projAssists") => (
-    <div className="space-y-2">
-      {rows.map((row, index) => (
-        <div
-          key={row.playerId}
-          className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500 w-5">{index + 1}</span>
-            <div className="h-9 w-9 overflow-hidden rounded-full border border-white/10 bg-white/5">
-              {row.headshotUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={row.headshotUrl}
-                  alt={row.fullName}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-[10px] text-slate-400">
-                  {row.fullName.slice(0, 2).toUpperCase()}
-                </div>
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-white">{row.fullName}</p>
-              <p className="text-xs text-slate-400">
-                {row.teamId} · {row.position}
-              </p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-slate-400">Projected</p>
-            <p className="text-sm font-semibold text-white">
-              {row[metric]}
-            </p>
-            <p className="text-[10px] text-slate-500">
-              {row.points} PTS · {row.goals} G · {row.assists} A
-            </p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  const trophies = [
+    {
+      name: "Rocket Richard",
+      desc: "Most goals",
+      color: "text-orange-300",
+      metric: "projGoals" as const,
+      rows: [...projections].sort((a, b) => b.projGoals - a.projGoals).slice(0, 5),
+    },
+    {
+      name: "Art Ross",
+      desc: "Most points",
+      color: "text-cyan-300",
+      metric: "projPoints" as const,
+      rows: [...projections].sort((a, b) => b.projPoints - a.projPoints).slice(0, 5),
+    },
+    {
+      name: "Playmaker",
+      desc: "Most assists",
+      color: "text-emerald-300",
+      metric: "projAssists" as const,
+      rows: [...projections].sort((a, b) => b.projAssists - a.projAssists).slice(0, 5),
+    },
+    {
+      name: "Norris",
+      desc: "Top defenseman",
+      color: "text-purple-300",
+      metric: "projPoints" as const,
+      rows: projections
+        .filter((row) => row.position === "D")
+        .sort((a, b) => b.projPoints - a.projPoints)
+        .slice(0, 5),
+    },
+    {
+      name: "Calder",
+      desc: "Top rookie",
+      color: "text-yellow-300",
+      metric: "projPoints" as const,
+      rows: projections
+        .filter((row) => row.rookieEligible)
+        .sort((a, b) => b.projPoints - a.projPoints)
+        .slice(0, 5),
+    },
+  ];
 
   return (
     <main className="mx-auto w-full max-w-6xl px-6 pb-24 pt-10 md:px-14">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between page-section">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-slate-300">
             Awards Forecast
@@ -162,57 +145,67 @@ export default async function AwardsPage() {
           <h1 className="text-4xl font-semibold text-white">Trophy Projections</h1>
         </div>
         <span className="stat-chip px-4 py-2 text-xs text-slate-200">
-          Pace-based projections
+          Pace-based
         </span>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <div className="glass rounded-3xl p-6">
-          <div className="flex items-center gap-3">
-            <Image src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="NHL" width={28} height={28} />
-            <h2 className="text-2xl font-semibold text-white">Rocket Richard</h2>
+      <div className="mt-8 grid gap-6 lg:grid-cols-2 page-section stagger-1">
+        {trophies.map((trophy) => (
+          <div key={trophy.name} className="glass rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className={`text-2xl font-semibold ${trophy.color}`}>
+                  {trophy.name}
+                </h2>
+                <p className="text-xs text-slate-400">{trophy.desc}</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {trophy.rows.map((row, index) => (
+                <div
+                  key={row.playerId}
+                  className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2.5"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="w-5 text-center text-[10px] text-slate-500">
+                      {index + 1}
+                    </span>
+                    <div className="h-8 w-8 overflow-hidden rounded-full border border-white/10 bg-white/5 shrink-0">
+                      {row.headshotUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={row.headshotUrl}
+                          alt={row.fullName}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-[8px] text-slate-400">
+                          {row.fullName.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-white">
+                        {row.fullName}
+                      </p>
+                      <p className="text-[10px] text-slate-500">
+                        {row.teamId} · {row.position}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-sm font-semibold ${trophy.color}`}>
+                      {row[trophy.metric]}
+                    </p>
+                    <p className="text-[10px] text-slate-500">
+                      {row.goals}G {row.assists}A {row.points}P
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <p className="mt-1 text-xs text-slate-400">Projected goals leader</p>
-          <div className="mt-4">{renderRows(topRocket, "projGoals")}</div>
-        </div>
-
-        <div className="glass rounded-3xl p-6">
-          <div className="flex items-center gap-3">
-            <Image src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="NHL" width={28} height={28} />
-            <h2 className="text-2xl font-semibold text-white">Art Ross</h2>
-          </div>
-          <p className="mt-1 text-xs text-slate-400">Projected points leader</p>
-          <div className="mt-4">{renderRows(topArtRoss, "projPoints")}</div>
-        </div>
-
-        <div className="glass rounded-3xl p-6">
-          <div className="flex items-center gap-3">
-            <Image src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="NHL" width={28} height={28} />
-            <h2 className="text-2xl font-semibold text-white">Playmaker</h2>
-          </div>
-          <p className="mt-1 text-xs text-slate-400">Projected assists leader</p>
-          <div className="mt-4">{renderRows(topPlaymaker, "projAssists")}</div>
-        </div>
-
-        <div className="glass rounded-3xl p-6">
-          <div className="flex items-center gap-3">
-            <Image src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="NHL" width={28} height={28} />
-            <h2 className="text-2xl font-semibold text-white">Norris</h2>
-          </div>
-          <p className="mt-1 text-xs text-slate-400">Projected defenseman points leader</p>
-          <div className="mt-4">{renderRows(topNorris, "projPoints")}</div>
-        </div>
-
-        <div className="glass rounded-3xl p-6">
-          <div className="flex items-center gap-3">
-            <Image src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="NHL" width={28} height={28} />
-            <h2 className="text-2xl font-semibold text-white">Calder</h2>
-          </div>
-          <p className="mt-1 text-xs text-slate-400">
-            Projected rookie points leader (eligibility from NHL career GP)
-          </p>
-          <div className="mt-4">{renderRows(topCalder, "projPoints")}</div>
-        </div>
+        ))}
       </div>
     </main>
   );

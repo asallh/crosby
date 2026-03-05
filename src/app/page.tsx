@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import PlayerProjectionPanel from "@/components/player-projection-panel";
 import { prisma } from "@/lib/db";
 
@@ -20,7 +21,7 @@ export default async function Home() {
       game: { include: { homeTeam: true, awayTeam: true } },
     },
     orderBy: { game: { gameDate: "asc" } },
-    take: 12,
+    take: 6,
   });
 
   const conferenceBuckets = standings.reduce(
@@ -39,13 +40,13 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen">
-      <header className="relative overflow-hidden px-6 pb-16 pt-6 md:px-14">
+      <header className="relative overflow-hidden px-6 pb-14 pt-10 md:px-14">
         <div className="absolute -right-32 top-10 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
         <div className="absolute -left-24 top-24 h-80 w-80 rounded-full bg-orange-500/10 blur-3xl" />
 
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-10">
           <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-5 page-section">
               <p className="text-xs uppercase tracking-[0.4em] text-slate-300">
                 League Intelligence Platform
               </p>
@@ -58,129 +59,126 @@ export default async function Home() {
                 performance.
               </p>
 
-              <div className="flex flex-wrap gap-3">
-                <div className="stat-chip px-4 py-2 text-xs text-slate-200">
+              <div className="flex flex-wrap gap-2">
+                <span className="stat-chip px-3 py-1.5 text-[11px] text-slate-200">
                   Weighted PPG model
-                </div>
-                <div className="stat-chip px-4 py-2 text-xs text-slate-200">
+                </span>
+                <span className="stat-chip px-3 py-1.5 text-[11px] text-slate-200">
                   Opponent defense adjusted
-                </div>
-                <div className="stat-chip px-4 py-2 text-xs text-slate-200">
+                </span>
+                <span className="stat-chip px-3 py-1.5 text-[11px] text-slate-200">
                   Home ice multiplier
-                </div>
+                </span>
               </div>
 
-              <div className="flex flex-wrap gap-4">
-                <a
+              <div className="flex flex-wrap gap-3 mt-2">
+                <Link
                   href="/players"
-                  className="rounded-full bg-cyan-400/20 px-5 py-2 text-xs uppercase tracking-[0.25em] text-cyan-100 transition hover:bg-cyan-400/40"
+                  className="rounded-full bg-cyan-400/20 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.2em] text-cyan-100 transition hover:bg-cyan-400/35 hover:shadow-lg hover:shadow-cyan-400/10"
                 >
                   Explore Players
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/teams"
-                  className="rounded-full bg-white/10 px-5 py-2 text-xs uppercase tracking-[0.25em] text-slate-200 transition hover:bg-white/20"
+                  className="rounded-full bg-white/8 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.2em] text-slate-200 transition hover:bg-white/15"
                 >
                   View Teams
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/matchups"
-                  className="rounded-full bg-white/10 px-5 py-2 text-xs uppercase tracking-[0.25em] text-slate-200 transition hover:bg-white/20"
+                  className="rounded-full bg-white/8 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.2em] text-slate-200 transition hover:bg-white/15"
                 >
                   Head-to-Head
-                </a>
+                </Link>
               </div>
             </div>
 
-            <div className="glass floaty rounded-3xl p-6">
+            <div className="glass floaty rounded-3xl p-6 page-section stagger-2">
               <div className="flex items-center justify-between">
                 <p className="text-xs uppercase tracking-[0.3em] text-slate-300">
                   Today&apos;s Pulse
                 </p>
-                <span className="text-xs text-slate-400">
-                  Updated {latestSnapshot?.snapshotDate.toLocaleDateString() ?? "--"}
+                <span className="text-[10px] text-slate-500">
+                  {latestSnapshot?.snapshotDate.toLocaleDateString() ?? "--"}
                 </span>
               </div>
-              <div className="mt-6 space-y-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-400">Total Teams</p>
-                    <p className="text-2xl font-semibold text-white">{standings.length}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-slate-400">Matchups queued</p>
-                    <p className="text-2xl font-semibold text-white">{matchups.length}</p>
-                  </div>
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <div className="rounded-2xl bg-white/5 p-4 text-center">
+                  <p className="text-[10px] uppercase tracking-widest text-slate-400">Teams</p>
+                  <p className="text-2xl font-semibold text-white">{standings.length}</p>
                 </div>
-                <div className="rounded-2xl bg-white/5 p-4">
-                  <p className="text-sm text-slate-300">
-                    Forecast engine: last 10 + last 20 + season blend.
-                  </p>
+                <div className="rounded-2xl bg-white/5 p-4 text-center">
+                  <p className="text-[10px] uppercase tracking-widest text-slate-400">Matchups</p>
+                  <p className="text-2xl font-semibold text-white">{matchups.length}</p>
                 </div>
+              </div>
+              <div className="mt-4 rounded-2xl bg-white/5 p-3">
+                <p className="text-xs text-slate-300">
+                  Forecast engine: last 10 (60%) + last 20 (30%) + season (10%).
+                </p>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 md:px-14">
-        <PlayerProjectionPanel />
+      <main className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 pb-24 md:px-14">
+        <div className="page-section stagger-1">
+          <PlayerProjectionPanel />
+        </div>
 
-        <section className="glass rounded-3xl p-6 md:p-8">
-          <div className="flex items-center justify-between">
+        <section className="glass rounded-3xl p-6 md:p-8 page-section stagger-2">
+          <div className="flex items-center justify-between mb-5">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-slate-300">
                 Daily Matchups
               </p>
-              <h2 className="text-3xl font-semibold text-white">Projected goals</h2>
+              <h2 className="text-2xl font-semibold text-white">Projected Goals</h2>
             </div>
-            <span className="stat-chip px-4 py-2 text-xs text-slate-200">
-              Next 12 games
-            </span>
+            <Link href="/matchups" className="stat-chip px-4 py-2 text-xs text-slate-200 hover:bg-white/10 transition">
+              View all
+            </Link>
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {matchups.map((matchup) => (
               <div
                 key={matchup.gameId}
-                className="rounded-2xl border border-white/10 bg-white/5 p-4"
+                className="rounded-2xl border border-white/8 bg-white/[0.03] p-4"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <Image
                       src={matchup.game.awayTeam.logoUrl}
                       alt={matchup.game.awayTeam.commonName}
-                      width={36}
-                      height={36}
+                      width={28}
+                      height={28}
                     />
-                    <span className="text-sm text-slate-200">
+                    <span className="text-xs font-medium text-slate-200">
                       {matchup.game.awayTeam.id}
                     </span>
-                    <span className="text-xs text-slate-400">@</span>
+                    <span className="text-[10px] text-slate-500">@</span>
                     <Image
                       src={matchup.game.homeTeam.logoUrl}
                       alt={matchup.game.homeTeam.commonName}
-                      width={36}
-                      height={36}
+                      width={28}
+                      height={28}
                     />
-                    <span className="text-sm text-slate-200">
+                    <span className="text-xs font-medium text-slate-200">
                       {matchup.game.homeTeam.id}
                     </span>
                   </div>
-                  <span className="text-xs text-slate-400">
-                    {matchup.game.gameDate.toLocaleDateString()}
-                  </span>
                 </div>
-                <div className="mt-4 flex items-center justify-between">
+                <div className="mt-3 flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-slate-400">Away xG</p>
-                    <p className="text-xl font-semibold text-white">
+                    <p className="text-[10px] text-slate-500">Away xG</p>
+                    <p className="text-lg font-semibold text-white">
                       {matchup.awayExpectedGoals.toFixed(2)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-slate-400">Home xG</p>
-                    <p className="text-xl font-semibold text-white">
+                    <p className="text-[10px] text-slate-500">Home xG</p>
+                    <p className="text-lg font-semibold text-white">
                       {matchup.homeExpectedGoals.toFixed(2)}
                     </p>
                   </div>
@@ -190,98 +188,53 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-2">
-          <div className="glass rounded-3xl p-6 md:p-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-300">
-                  Conference Standings
-                </p>
-                <h2 className="text-2xl font-semibold text-white">Eastern</h2>
-              </div>
-              <span className="stat-chip px-3 py-1 text-xs text-slate-200">
-                Draft Pick
-              </span>
-            </div>
-            <div className="mt-4 space-y-3">
-              {conferenceBuckets.east.map((entry) => (
-                <div
-                  key={entry.teamId}
-                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <Image
-                      src={entry.team.logoUrl}
-                      alt={entry.team.commonName}
-                      width={32}
-                      height={32}
-                    />
-                    <div>
-                      <p className="text-sm font-semibold text-white">
-                        {entry.team.commonName}
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        {entry.wins}-{entry.losses}-{entry.otLosses}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-slate-400">Conf Rank</p>
-                    <p className="text-sm text-white">#{entry.conferenceRank}</p>
-                    <p className="text-xs text-cyan-300">
-                      Pick {draftPickForRank(entry.leagueRank)}
-                    </p>
-                  </div>
+        <section className="grid gap-6 lg:grid-cols-2 page-section stagger-3">
+          {(["east", "west"] as const).map((conf) => (
+            <div key={conf} className="glass rounded-3xl p-6 md:p-8">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-slate-300">
+                    Conference Standings
+                  </p>
+                  <h2 className="text-2xl font-semibold text-white">
+                    {conf === "east" ? "Eastern" : "Western"}
+                  </h2>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="glass rounded-3xl p-6 md:p-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-300">
-                  Conference Standings
-                </p>
-                <h2 className="text-2xl font-semibold text-white">Western</h2>
               </div>
-              <span className="stat-chip px-3 py-1 text-xs text-slate-200">
-                Draft Pick
-              </span>
-            </div>
-            <div className="mt-4 space-y-3">
-              {conferenceBuckets.west.map((entry) => (
-                <div
-                  key={entry.teamId}
-                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <Image
-                      src={entry.team.logoUrl}
-                      alt={entry.team.commonName}
-                      width={32}
-                      height={32}
-                    />
-                    <div>
-                      <p className="text-sm font-semibold text-white">
-                        {entry.team.commonName}
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        {entry.wins}-{entry.losses}-{entry.otLosses}
-                      </p>
+              <div className="space-y-2">
+                {conferenceBuckets[conf].map((entry) => (
+                  <Link
+                    key={entry.teamId}
+                    href={`/teams/${entry.teamId}`}
+                    className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2.5 transition hover:bg-white/[0.06]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={entry.team.logoUrl}
+                        alt={entry.team.commonName}
+                        width={24}
+                        height={24}
+                      />
+                      <div>
+                        <p className="text-xs font-semibold text-white">
+                          {entry.team.commonName}
+                        </p>
+                        <p className="text-[10px] text-slate-500">
+                          {entry.wins}-{entry.losses}-{entry.otLosses} · {entry.points} pts
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-slate-400">Conf Rank</p>
-                    <p className="text-sm text-white">#{entry.conferenceRank}</p>
-                    <p className="text-xs text-cyan-300">
-                      Pick {draftPickForRank(entry.leagueRank)}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                    <div className="flex items-center gap-3 text-right">
+                      <span className="text-[10px] text-slate-400">#{entry.conferenceRank}</span>
+                      <span className="text-[10px] text-cyan-400">
+                        Pick {draftPickForRank(entry.leagueRank)}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          ))}
         </section>
       </main>
     </div>

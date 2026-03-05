@@ -1,5 +1,7 @@
-import Image from "next/image";
+import Link from "next/link";
 import { prisma } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 type RookieRow = {
   playerId: number;
@@ -92,7 +94,7 @@ export default async function RookiesPage() {
 
   return (
     <main className="mx-auto w-full max-w-6xl px-6 pb-24 pt-10 md:px-14">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between page-section">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-slate-300">
             Rookie Tracker
@@ -106,53 +108,56 @@ export default async function RookiesPage() {
         </span>
       </div>
 
-      <div className="mt-8 space-y-3">
+      <div className="mt-8 space-y-2 page-section stagger-1">
         {rookies.map((row, index) => (
-          <div
+          <Link
             key={row.playerId}
-            className="glass flex flex-col gap-4 rounded-2xl p-4 md:flex-row md:items-center md:justify-between"
+            href={`/players/${row.playerId}`}
+            className="glass flex items-center gap-4 rounded-2xl p-3 transition hover:-translate-y-0.5 hover:border-white/15"
           >
-            <div className="flex items-center gap-4">
-              <span className="text-xs text-slate-500 w-6">{index + 1}</span>
-              <div className="h-12 w-12 overflow-hidden rounded-full border border-white/10 bg-white/5">
-                {row.headshotUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={row.headshotUrl}
-                    alt={row.fullName}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-[10px] text-slate-400">
-                    {row.fullName.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
+            <span className="w-8 text-center text-xs text-slate-500">
+              {index + 1}
+            </span>
+            <div className="h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-white/5 shrink-0">
+              {row.headshotUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={row.headshotUrl}
+                  alt={row.fullName}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-[10px] text-slate-400">
+                  {row.fullName.slice(0, 2).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-white truncate">
+                {row.fullName}
+              </p>
+              <p className="text-[10px] text-slate-500">
+                {row.teamId} · {row.position} · {row.gamesPlayed} GP
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-[10px] text-slate-500">G</p>
+                <p className="text-xs font-semibold text-white">{row.goals}</p>
+                <p className="text-[8px] text-slate-600">proj {row.projGoals}</p>
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">{row.fullName}</p>
-                <p className="text-xs text-slate-400">
-                  {row.teamId} · {row.position} · {row.gamesPlayed} GP
-                </p>
+                <p className="text-[10px] text-slate-500">A</p>
+                <p className="text-xs font-semibold text-white">{row.assists}</p>
+                <p className="text-[8px] text-slate-600">proj {row.projAssists}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-500">PTS</p>
+                <p className="text-xs font-semibold text-yellow-300">{row.points}</p>
+                <p className="text-[8px] text-slate-600">proj {row.projPoints}</p>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="rounded-xl bg-white/5 px-4 py-2">
-                <p className="text-[10px] text-slate-400">Projected PTS</p>
-                <p className="text-sm font-semibold text-white">{row.projPoints}</p>
-                <p className="text-[10px] text-slate-500">{row.points} current</p>
-              </div>
-              <div className="rounded-xl bg-white/5 px-4 py-2">
-                <p className="text-[10px] text-slate-400">Projected G</p>
-                <p className="text-sm font-semibold text-white">{row.projGoals}</p>
-                <p className="text-[10px] text-slate-500">{row.goals} current</p>
-              </div>
-              <div className="rounded-xl bg-white/5 px-4 py-2">
-                <p className="text-[10px] text-slate-400">Projected A</p>
-                <p className="text-sm font-semibold text-white">{row.projAssists}</p>
-                <p className="text-[10px] text-slate-500">{row.assists} current</p>
-              </div>
-            </div>
-          </div>
+          </Link>
         ))}
       </div>
     </main>
