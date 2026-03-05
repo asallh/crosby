@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import PlayerSearch from "@/components/player-search";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -58,7 +59,11 @@ export default async function PlayersPage() {
         </span>
       </div>
 
-      <div className="mt-8 space-y-2 page-section stagger-1">
+      <div className="relative z-30 mt-6 page-section stagger-1">
+        <PlayerSearch />
+      </div>
+
+      <div className="relative z-10 mt-8 space-y-2 page-section stagger-1">
         {sortedPlayers.map((player, index) => (
           <Link
             key={player.id}
