@@ -8,6 +8,7 @@ import {
   weightedPointsPerGame,
 } from "@/lib/projections";
 import PlayerMatchups from "@/components/player-matchups";
+import PlayerTrendChart from "@/components/player-trend-chart";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -46,12 +47,56 @@ export default async function PlayerDetailPage({ params }: PageProps) {
     include: { homeTeam: true, awayTeam: true },
   });
   const gamesMap = new Map(games.map((game) => [game.id, game]));
-
   const seasonTotals = await prisma.playerGameLog.aggregate({
     where: { playerId },
     _sum: { goals: true, assists: true, points: true },
     _count: { _all: true },
   });
+
+  const fullSeasonLogs = await prisma.playerGameLog.findMany({
+    where: { playerId },
+    select: { points: true, goals: true, assists: true, shots: true },
+    orderBy: { gameId: "desc" },
+  });
+
+  const seasonTrendLogs = await prisma.playerGameLog.findMany({
+    where: { playerId },
+    select: { gameId: true, points: true },
+    orderBy: { gameId: "asc" },
+  });
+
+  const seasonGameIds = seasonTrendLogs.map((log) => log.gameId);
+  const seasonGames = await prisma.game.findMany({
+    where: { id: { in: seasonGameIds } },
+    include: { homeTeam: true, awayTeam: true },
+  });
+  const seasonGamesMap = new Map(
+    seasonGames.map((game) => [game.id, game])
+  );
+
+  const gp = seasonTotals._count._all;
+  const pts = seasonTotals._sum.points ?? 0;
+  const g = seasonTotals._sum.goals ?? 0;
+  const a = seasonTotals._sum.assists ?? 0;
+
+  const totalGames = 82;
+  let runningTotal = 0;
+  const trendData = seasonTrendLogs.map((log, index) => {
+    runningTotal += log.points ?? 0;
+    const game = seasonGamesMap.get(log.gameId);
+    const label = (() => {
+      if (!game) return `Game ${log.gameId}`;
+      const home = game.homeTeamId === player.teamId;
+      const opponent = home ? game.awayTeam : game.homeTeam;
+      return `${home ? "vs" : "@"} ${opponent.commonName}`;
+    })();
+    return {
+      label,
+      gameNumber: index + 1,
+      cumulativePoints: runningTotal,
+    };
+  });
+  const lastTenTrendData = trendData.slice(-10);
 
   const nextGame = await prisma.game.findFirst({
     where: {
@@ -75,7 +120,7 @@ export default async function PlayerDetailPage({ params }: PageProps) {
     : null;
 
   const basePoints = weightedPointsPerGame(
-    logs.map((log) => ({
+    fullSeasonLogs.map((log) => ({
       points: log.points,
       goals: log.goals,
       assists: log.assists,
@@ -89,7 +134,14 @@ export default async function PlayerDetailPage({ params }: PageProps) {
           basePoints *
           opponentDefenseAdjustment(opponentStats?.gaPerGame ?? 3.1) *
           homeIceAdjustment(isHome),
-        confidence: confidenceScore(logs.length),
+        confidence: confidenceScore(
+          fullSeasonLogs.map((log) => ({
+            points: log.points,
+            goals: log.goals,
+            assists: log.assists,
+            shots: log.shots ?? undefined,
+          }))
+        ),
       }
     : null;
 
@@ -103,10 +155,8 @@ export default async function PlayerDetailPage({ params }: PageProps) {
         }
       : null);
 
-  const gp = seasonTotals._count._all;
-  const pts = seasonTotals._sum.points ?? 0;
-  const g = seasonTotals._sum.goals ?? 0;
-  const a = seasonTotals._sum.assists ?? 0;
+  const remainingGames = Math.max(totalGames - gp, 0);
+  const projectedEnd = pts + basePoints * remainingGames;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-6 pb-24 pt-10 md:px-14">
@@ -165,7 +215,17 @@ export default async function PlayerDetailPage({ params }: PageProps) {
         ))}
       </div>
 
-      <div className="mt-6 glass rounded-3xl p-6 page-section stagger-2">
+      <div className="mt-6 page-section stagger-2">
+        <PlayerTrendChart
+          seasonData={trendData}
+          lastTenData={lastTenTrendData}
+          currentGames={gp}
+          totalGames={totalGames}
+          projectedEnd={projectedEnd}
+        />
+      </div>
+
+      <div className="mt-6 glass rounded-3xl p-6 page-section stagger-3">
         <h2 className="text-xl font-semibold text-white">Next Game Projection</h2>
         {effectiveProjection ? (
           <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -205,7 +265,7 @@ export default async function PlayerDetailPage({ params }: PageProps) {
         )}
       </div>
 
-      <div className="page-section stagger-3">
+      <div className="page-section stagger-4">
         <PlayerMatchups
           logs={logs.map((log) => {
             const game = gamesMap.get(log.gameId);

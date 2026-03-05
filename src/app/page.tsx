@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import PlayerProjectionPanel from "@/components/player-projection-panel";
+import PlayerConfidenceList from "@/components/player-confidence-list";
 import { prisma } from "@/lib/db";
 
 export default async function Home() {
@@ -22,6 +23,13 @@ export default async function Home() {
     },
     orderBy: { game: { gameDate: "asc" } },
     take: 6,
+  });
+
+  const confidenceBoard = await prisma.projection.findMany({
+    where: { game: { gameDate: { gte: new Date() } } },
+    include: { player: true, game: true },
+    orderBy: { confidence: "desc" },
+    take: 10,
   });
 
   const conferenceBuckets = standings.reduce(
@@ -127,7 +135,24 @@ export default async function Home() {
           <PlayerProjectionPanel />
         </div>
 
-        <section className="glass rounded-3xl p-6 md:p-8 page-section stagger-2">
+        <section className="page-section stagger-2">
+          <PlayerConfidenceList
+            entries={confidenceBoard.map((entry) => ({
+              playerId: entry.playerId,
+              fullName: entry.player.fullName,
+              teamId: entry.player.teamId,
+              position: entry.player.position,
+              headshotUrl: entry.player.headshotUrl,
+              expectedPoints: entry.expectedPoints,
+              confidence: entry.confidence,
+              gameDate: entry.game.gameDate.toISOString(),
+              homeTeamId: entry.game.homeTeamId,
+              awayTeamId: entry.game.awayTeamId,
+            }))}
+          />
+        </section>
+
+        <section className="glass rounded-3xl p-6 md:p-8 page-section stagger-3">
           <div className="flex items-center justify-between mb-5">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-slate-300">
@@ -188,7 +213,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-2 page-section stagger-3">
+        <section className="grid gap-6 lg:grid-cols-2 page-section stagger-4">
           {(["east", "west"] as const).map((conf) => (
             <div key={conf} className="glass rounded-3xl p-6 md:p-8">
               <div className="flex items-center justify-between mb-4">

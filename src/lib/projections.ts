@@ -36,11 +36,41 @@ export function homeIceAdjustment(isHome: boolean) {
   return isHome ? 1.05 : 0.97;
 }
 
-export function confidenceScore(sampleSize: number) {
-  if (sampleSize >= 20) return 0.78;
-  if (sampleSize >= 10) return 0.68;
-  if (sampleSize >= 5) return 0.58;
-  return 0.45;
+export function confidenceScore(logs: GameLogSample[]) {
+  if (logs.length === 0) return 0.4;
+
+  const points = logs.map((log) => log.points ?? 0);
+  const sampleSize = points.length;
+  const average = points.reduce((sum, value) => sum + value, 0) / sampleSize;
+  const variance =
+    points.reduce((sum, value) => sum + (value - average) ** 2, 0) / sampleSize;
+  const volatility = Math.min(Math.sqrt(variance), 3);
+  const stabilityScore = 1 - Math.min(volatility / 2.2, 1);
+
+  const recentSample = points.slice(0, Math.min(sampleSize, 8));
+  const recentAverage =
+    recentSample.reduce((sum, value) => sum + value, 0) /
+    Math.max(recentSample.length, 1);
+  const momentumDelta = recentAverage - average;
+  const momentumScore = Math.min(Math.max(momentumDelta / 1.8, -1), 1) * 0.5 + 0.5;
+
+  let streak = 0;
+  for (const value of points) {
+    if (value > 0) streak += 1;
+    else break;
+  }
+  const streakScore = Math.min(streak / 8, 1);
+
+  const sampleScore = 1 - Math.exp(-sampleSize / 28);
+
+  const score =
+    0.35 +
+    sampleScore * 0.32 +
+    stabilityScore * 0.2 +
+    momentumScore * 0.1 +
+    streakScore * 0.03;
+
+  return Math.min(Math.max(score, 0.3), 0.92);
 }
 
 export function matchupExpectedGoals(
